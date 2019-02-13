@@ -1,8 +1,6 @@
 #ifndef _GREEDYSNAKE_H
 #define _GREEDYSNAKE_H
 #include <queue>
-#define findFruit true
-#define findRear false
 class Node {
 public:
 	Node *next;
@@ -33,10 +31,8 @@ public:
 	bool isGameOver();
 	void run();
 	void show();
-	void solveAI();
 	inline bool judgeDir(int x, int y, direction &next_dir, direction dir);
-	inline bool judgeFarDir(int x, int y, direction &next_dir, direction dir);
-	bool findPath(direction &next_dir, int start_x, int start_y, int end_x, int end_y);
+	void findPath(direction &next_dir, int start_x, int start_y, int end_x, int end_y);
 	bool findPathBFS(int start_x, int start_y, int end_x, int end_y, bool flag);
 private:
 	int max_hight;
@@ -52,6 +48,5 @@ private:
 	direction next_direction;
 	bool isGetNextDirection;
 	bool canFindPath;
-	//std::queue<Point> queueBFS;
 };
 #endif

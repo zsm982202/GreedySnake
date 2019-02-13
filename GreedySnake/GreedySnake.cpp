@@ -177,19 +177,11 @@ void GreedySnake::setRandomFruit() {
 }
 
 void GreedySnake::run() {
-	char input;
 	while (true) {
 		direction d;
-		if (findPath(d, node_front->x, node_front->y, fruit_x, fruit_y)) {
-			dir = d;
-			move(d);
-		}
-		else {
-			//cout << "false" << endl;
-			Sleep(300000000);
-		}
-		
-		
+		findPath(d, node_front->x, node_front->y, fruit_x, fruit_y);
+		dir = d;
+		move(d);
 		show();
 		Sleep(30);
 	}
@@ -197,7 +189,6 @@ void GreedySnake::run() {
 
 inline bool GreedySnake::judgeDir(int x, int y, direction &next_dir, direction d) {
 	if (x < 0 || x >= max_width || y < 0 || y >= max_hight)
-		//cout << "ok" << endl;
 		return false;
 	if (!visited_matrix[y*max_width + x]||(x==node_rear->x&&y==node_rear->y)) {
 		int next_node_front_x;
@@ -250,54 +241,53 @@ inline bool GreedySnake::judgeDir(int x, int y, direction &next_dir, direction d
 	return false;
 }
 
-bool GreedySnake::findPath(direction &next_dir, int start_x, int start_y, int end_x, int end_y) {
+void GreedySnake::findPath(direction &next_dir, int start_x, int start_y, int end_x, int end_y) {
 	if (findPathBFS(start_x, start_y, end_x, end_y, false)) {
-		//cout << "true";
 		if (end_x >= start_x) {
 			//Right&&Down
 			if (end_y >= start_y) {
 				if (abs(end_x - start_x) > abs(end_y - start_y)) {
 					if (judgeDir(start_x + 1, start_y, next_dir, Right))
-						return true;
+						return;
 					if (judgeDir(start_x, start_y + 1, next_dir, Down))
-						return true;
+						return;
 					if (judgeDir(start_x, start_y - 1, next_dir, Up))
-						return true;
+						return;
 					if (judgeDir(start_x - 1, start_y, next_dir, Left))
-						return true;
+						return;
 				}
 				else if (abs(end_x - start_x) < abs(end_y - start_y)) {
 					if (judgeDir(start_x, start_y + 1, next_dir, Down))
-						return true;
+						return;
 					if (judgeDir(start_x + 1, start_y, next_dir, Right))
-						return true;
+						return;
 					if (judgeDir(start_x - 1, start_y, next_dir, Left))
-						return true;
+						return;
 					if (judgeDir(start_x, start_y - 1, next_dir, Up))
-						return true;
+						return;
 				}
 				else {
-					srand(time(0));
+					srand((int)time(0));
 					int t = rand() % 2;
 					if (t == 0) {
 						if (judgeDir(start_x + 1, start_y, next_dir, Right))
-							return true;
+							return;
 						if (judgeDir(start_x, start_y + 1, next_dir, Down))
-							return true;
+							return;
 						if (judgeDir(start_x, start_y - 1, next_dir, Up))
-							return true;
+							return;
 						if (judgeDir(start_x - 1, start_y, next_dir, Left))
-							return true;
+							return;
 					}
 					else {
 						if (judgeDir(start_x, start_y + 1, next_dir, Down))
-							return true;
+							return;
 						if (judgeDir(start_x + 1, start_y, next_dir, Right))
-							return true;
+							return;
 						if (judgeDir(start_x - 1, start_y, next_dir, Left))
-							return true;
+							return;
 						if (judgeDir(start_x, start_y - 1, next_dir, Up))
-							return true;
+							return;
 					}
 				}
 			}
@@ -305,46 +295,46 @@ bool GreedySnake::findPath(direction &next_dir, int start_x, int start_y, int en
 			else {
 				if (abs(end_x - start_x) > abs(end_y - start_y)) {
 					if (judgeDir(start_x + 1, start_y, next_dir, Right))
-						return true;
+						return;
 					if (judgeDir(start_x, start_y - 1, next_dir, Up))
-						return true;
+						return;
 					if (judgeDir(start_x, start_y + 1, next_dir, Down))
-						return true;
+						return;
 					if (judgeDir(start_x - 1, start_y, next_dir, Left))
-						return true;
+						return;
 				}
 				else if (abs(end_x - start_x) < abs(end_y - start_y)) {
 					if (judgeDir(start_x, start_y - 1, next_dir, Up))
-						return true;
+						return;
 					if (judgeDir(start_x + 1, start_y, next_dir, Right))
-						return true;
+						return;
 					if (judgeDir(start_x - 1, start_y, next_dir, Left))
-						return true;
+						return;
 					if (judgeDir(start_x, start_y + 1, next_dir, Down))
-						return true;
+						return;
 				}
 				else {
-					srand(time(0));
+					srand((int)time(0));
 					int t = rand() % 2;
 					if (t == 0) {
 						if (judgeDir(start_x + 1, start_y, next_dir, Right))
-							return true;
+							return;
 						if (judgeDir(start_x, start_y - 1, next_dir, Up))
-							return true;
+							return;
 						if (judgeDir(start_x, start_y + 1, next_dir, Down))
-							return true;
+							return;
 						if (judgeDir(start_x - 1, start_y, next_dir, Left))
-							return true;
+							return;
 					}
 					else {
 						if (judgeDir(start_x, start_y - 1, next_dir, Up))
-							return true;
+							return;
 						if (judgeDir(start_x + 1, start_y, next_dir, Right))
-							return true;
+							return;
 						if (judgeDir(start_x - 1, start_y, next_dir, Left))
-							return true;
+							return;
 						if (judgeDir(start_x, start_y + 1, next_dir, Down))
-							return true;
+							return;
 					}
 				}
 			}
@@ -354,46 +344,46 @@ bool GreedySnake::findPath(direction &next_dir, int start_x, int start_y, int en
 			if (end_y >= start_y) {
 				if (abs(end_x - start_x) > abs(end_y - start_y)) {
 					if (judgeDir(start_x - 1, start_y, next_dir, Left))
-						return true;
+						return;
 					if (judgeDir(start_x, start_y + 1, next_dir, Down))
-						return true;
+						return;
 					if (judgeDir(start_x, start_y - 1, next_dir, Up))
-						return true;
+						return;
 					if (judgeDir(start_x + 1, start_y, next_dir, Right))
-						return true;
+						return;
 				}
 				else if (abs(end_x - start_x) < abs(end_y - start_y)) {
 					if (judgeDir(start_x, start_y + 1, next_dir, Down))
-						return true;
+						return;
 					if (judgeDir(start_x - 1, start_y, next_dir, Left))
-						return true;
+						return;
 					if (judgeDir(start_x + 1, start_y, next_dir, Right))
-						return true;
+						return;
 					if (judgeDir(start_x, start_y - 1, next_dir, Up))
-						return true;
+						return;
 				}
 				else {
-					srand(time(0));
+					srand((int)time(0));
 					int t = rand() % 2;
 					if (t == 0) {
 						if (judgeDir(start_x - 1, start_y, next_dir, Left))
-							return true;
+							return;
 						if (judgeDir(start_x, start_y + 1, next_dir, Down))
-							return true;
+							return;
 						if (judgeDir(start_x, start_y - 1, next_dir, Up))
-							return true;
+							return;
 						if (judgeDir(start_x + 1, start_y, next_dir, Right))
-							return true;
+							return;
 					}
 					else {
 						if (judgeDir(start_x, start_y + 1, next_dir, Down))
-							return true;
+							return;
 						if (judgeDir(start_x - 1, start_y, next_dir, Left))
-							return true;
+							return;
 						if (judgeDir(start_x + 1, start_y, next_dir, Right))
-							return true;
+							return;
 						if (judgeDir(start_x, start_y - 1, next_dir, Up))
-							return true;
+							return;
 					}
 				}
 			}
@@ -401,46 +391,46 @@ bool GreedySnake::findPath(direction &next_dir, int start_x, int start_y, int en
 			else {
 				if (abs(end_x - start_x) > abs(end_y - start_y)) {
 					if (judgeDir(start_x - 1, start_y, next_dir, Left))
-						return true;
+						return;
 					if (judgeDir(start_x, start_y - 1, next_dir, Up))
-						return true;
+						return;
 					if (judgeDir(start_x, start_y + 1, next_dir, Down))
-						return true;
+						return;
 					if (judgeDir(start_x + 1, start_y, next_dir, Right))
-						return true;
+						return;
 				}
 				else if (abs(end_x - start_x) < abs(end_y - start_y)) {
 					if (judgeDir(start_x, start_y - 1, next_dir, Up))
-						return true;
+						return;
 					if (judgeDir(start_x - 1, start_y, next_dir, Left))
-						return true;
+						return;
 					if (judgeDir(start_x + 1, start_y, next_dir, Right))
-						return true;
+						return;
 					if (judgeDir(start_x, start_y + 1, next_dir, Down))
-						return true;
+						return;
 				}
 				else {
-					srand(time(0));
+					srand((int)time(0));
 					int t = rand() % 2;
 					if (t == 0) {
 						if (judgeDir(start_x - 1, start_y, next_dir, Left))
-							return true;
+							return;
 						if (judgeDir(start_x, start_y - 1, next_dir, Up))
-							return true;
+							return;
 						if (judgeDir(start_x, start_y + 1, next_dir, Down))
-							return true;
+							return;
 						if (judgeDir(start_x + 1, start_y, next_dir, Right))
-							return true;
+							return;
 					}
 					else {
 						if (judgeDir(start_x, start_y - 1, next_dir, Up))
-							return true;
+							return;
 						if (judgeDir(start_x - 1, start_y, next_dir, Left))
-							return true;
+							return;
 						if (judgeDir(start_x + 1, start_y, next_dir, Right))
-							return true;
+							return;
 						if (judgeDir(start_x, start_y + 1, next_dir, Down))
-							return true;
+							return;
 					}
 				}
 			}
@@ -452,46 +442,46 @@ bool GreedySnake::findPath(direction &next_dir, int start_x, int start_y, int en
 			if (end_y >= start_y) {
 				if (abs(end_x - start_x) > abs(end_y - start_y)) {
 					if (judgeDir(start_x - 1, start_y, next_dir, Left))
-						return true;
+						return;
 					if (judgeDir(start_x, start_y - 1, next_dir, Up))
-						return true;
+						return;
 					if (judgeDir(start_x, start_y + 1, next_dir, Down))
-						return true;
+						return;
 					if (judgeDir(start_x + 1, start_y, next_dir, Right))
-						return true;
+						return;
 				}
 				else if (abs(end_x - start_x) < abs(end_y - start_y)) {
 					if (judgeDir(start_x, start_y - 1, next_dir, Up))
-						return true;
+						return;
 					if (judgeDir(start_x - 1, start_y, next_dir, Left))
-						return true;
+						return;
 					if (judgeDir(start_x + 1, start_y, next_dir, Right))
-						return true;
+						return;
 					if (judgeDir(start_x, start_y + 1, next_dir, Down))
-						return true;
+						return;
 				}
 				else {
-					srand(time(0));
+					srand((int)time(0));
 					int t = rand() % 2;
 					if (t == 0) {
 						if (judgeDir(start_x - 1, start_y, next_dir, Left))
-							return true;
+							return;
 						if (judgeDir(start_x, start_y - 1, next_dir, Up))
-							return true;
+							return;
 						if (judgeDir(start_x, start_y + 1, next_dir, Down))
-							return true;
+							return;
 						if (judgeDir(start_x + 1, start_y, next_dir, Right))
-							return true;
+							return;
 					}
 					else {
 						if (judgeDir(start_x, start_y - 1, next_dir, Up))
-							return true;
+							return;
 						if (judgeDir(start_x - 1, start_y, next_dir, Left))
-							return true;
+							return;
 						if (judgeDir(start_x + 1, start_y, next_dir, Right))
-							return true;
+							return;
 						if (judgeDir(start_x, start_y + 1, next_dir, Down))
-							return true;
+							return;
 					}
 				}
 			}
@@ -499,46 +489,46 @@ bool GreedySnake::findPath(direction &next_dir, int start_x, int start_y, int en
 			else {
 				if (abs(end_x - start_x) > abs(end_y - start_y)) {
 					if (judgeDir(start_x - 1, start_y, next_dir, Left))
-						return true;
+						return;
 					if (judgeDir(start_x, start_y + 1, next_dir, Down))
-						return true;
+						return;
 					if (judgeDir(start_x, start_y - 1, next_dir, Up))
-						return true;
+						return;
 					if (judgeDir(start_x + 1, start_y, next_dir, Right))
-						return true;
+						return;
 				}
 				else if (abs(end_x - start_x) < abs(end_y - start_y)) {
 					if (judgeDir(start_x, start_y + 1, next_dir, Down))
-						return true;
+						return;
 					if (judgeDir(start_x - 1, start_y, next_dir, Left))
-						return true;
+						return;
 					if (judgeDir(start_x + 1, start_y, next_dir, Right))
-						return true;
+						return;
 					if (judgeDir(start_x, start_y - 1, next_dir, Up))
-						return true;
+						return;
 				}
 				else {
-					srand(time(0));
+					srand((int)time(0));
 					int t = rand() % 2;
 					if (t == 0) {
 						if (judgeDir(start_x - 1, start_y, next_dir, Left))
-							return true;
+							return;
 						if (judgeDir(start_x, start_y + 1, next_dir, Down))
-							return true;
+							return;
 						if (judgeDir(start_x, start_y - 1, next_dir, Up))
-							return true;
+							return;
 						if (judgeDir(start_x + 1, start_y, next_dir, Right))
-							return true;
+							return;
 					}
 					else {
 						if (judgeDir(start_x, start_y + 1, next_dir, Down))
-							return true;
+							return;
 						if (judgeDir(start_x - 1, start_y, next_dir, Left))
-							return true;
+							return;
 						if (judgeDir(start_x + 1, start_y, next_dir, Right))
-							return true;
+							return;
 						if (judgeDir(start_x, start_y - 1, next_dir, Up))
-							return true;
+							return;
 					}
 				}
 			}
@@ -548,46 +538,46 @@ bool GreedySnake::findPath(direction &next_dir, int start_x, int start_y, int en
 			if (end_y >= start_y) {
 				if (abs(fruit_x - start_x) > abs(end_y - start_y)) {
 					if (judgeDir(start_x + 1, start_y, next_dir, Right))
-						return true;
+						return;
 					if (judgeDir(start_x, start_y - 1, next_dir, Up))
-						return true;
+						return;
 					if (judgeDir(start_x, start_y + 1, next_dir, Down))
-						return true;
+						return;
 					if (judgeDir(start_x - 1, start_y, next_dir, Left))
-						return true;
+						return;
 				}
 				else if (abs(fruit_x - start_x) < abs(end_y - start_y)) {
 					if (judgeDir(start_x, start_y - 1, next_dir, Up))
-						return true;
+						return;
 					if (judgeDir(start_x + 1, start_y, next_dir, Right))
-						return true;
+						return;
 					if (judgeDir(start_x - 1, start_y, next_dir, Left))
-						return true;
+						return;
 					if (judgeDir(start_x, start_y + 1, next_dir, Down))
-						return true;
+						return;
 				}
 				else {
-					srand(time(0));
+					srand((int)time(0));
 					int t = rand() % 2;
 					if (t == 0) {
 						if (judgeDir(start_x + 1, start_y, next_dir, Right))
-							return true;
+							return;
 						if (judgeDir(start_x, start_y - 1, next_dir, Up))
-							return true;
+							return;
 						if (judgeDir(start_x, start_y + 1, next_dir, Down))
-							return true;
+							return;
 						if (judgeDir(start_x - 1, start_y, next_dir, Left))
-							return true;
+							return;
 					}
 					else {
 						if (judgeDir(start_x, start_y - 1, next_dir, Up))
-							return true;
+							return;
 						if (judgeDir(start_x + 1, start_y, next_dir, Right))
-							return true;
+							return;
 						if (judgeDir(start_x - 1, start_y, next_dir, Left))
-							return true;
+							return;
 						if (judgeDir(start_x, start_y + 1, next_dir, Down))
-							return true;
+							return;
 					}
 				}
 			}
@@ -595,52 +585,51 @@ bool GreedySnake::findPath(direction &next_dir, int start_x, int start_y, int en
 			else {
 				if (abs(end_x - start_x) > abs(end_y - start_y)) {
 					if (judgeDir(start_x + 1, start_y, next_dir, Right))
-						return true;
+						return;
 					if (judgeDir(start_x, start_y + 1, next_dir, Down))
-						return true;
+						return;
 					if (judgeDir(start_x, start_y - 1, next_dir, Up))
-						return true;
+						return;
 					if (judgeDir(start_x - 1, start_y, next_dir, Left))
-						return true;
+						return;
 				}
 				else if (abs(end_x - start_x) < abs(end_y - start_y)) {
 					if (judgeDir(start_x, start_y + 1, next_dir, Down))
-						return true;
+						return;
 					if (judgeDir(start_x + 1, start_y, next_dir, Right))
-						return true;
+						return;
 					if (judgeDir(start_x - 1, start_y, next_dir, Left))
-						return true;
+						return;
 					if (judgeDir(start_x, start_y - 1, next_dir, Up))
-						return true;
+						return;
 				}
 				else {
-					srand(time(0));
+					srand((int)time(0));
 					int t = rand() % 2;
 					if (t == 0) {
 						if (judgeDir(start_x + 1, start_y, next_dir, Right))
-							return true;
+							return;
 						if (judgeDir(start_x, start_y + 1, next_dir, Down))
-							return true;
+							return;
 						if (judgeDir(start_x, start_y - 1, next_dir, Up))
-							return true;
+							return;
 						if (judgeDir(start_x - 1, start_y, next_dir, Left))
-							return true;
+							return;
 					}
 					else {
 						if (judgeDir(start_x, start_y + 1, next_dir, Down))
-							return true;
+							return;
 						if (judgeDir(start_x + 1, start_y, next_dir, Right))
-							return true;
+							return;
 						if (judgeDir(start_x - 1, start_y, next_dir, Left))
-							return true;
+							return;
 						if (judgeDir(start_x, start_y - 1, next_dir, Up))
-							return true;
+							return;
 					}
 				}
 			}
 		}
 	}
-	return false;
 }
 
 
