@@ -1,10 +1,19 @@
 #ifndef _GREEDYSNAKE_H
 #define _GREEDYSNAKE_H
 #include <queue>
+#define findFruit true
+#define findRear false
 class Node {
 public:
 	Node *next;
 	Node *prev;
+	int x;
+	int y;
+};
+
+class Point {
+public:
+	Point(int xx, int yy) { x = xx; y = yy; }
 	int x;
 	int y;
 };
@@ -19,15 +28,16 @@ public:
 	void initSnake();
 	void setRandomFruit();
 	void updateVisitedMatrix();
-	void move();
-	bool isEat();
+	void move(direction d);
+	bool isEat(direction d);
 	bool isGameOver();
 	void run();
 	void show();
 	void solveAI();
-	bool findPath(direction &next_dir);
-	void findPathDFS(int x, int y, int step, bool flag);
-	bool findPathBFS(int x, int y);
+	inline bool judgeDir(int x, int y, direction &next_dir, direction dir);
+	inline bool judgeFarDir(int x, int y, direction &next_dir, direction dir);
+	bool findPath(direction &next_dir, int start_x, int start_y, int end_x, int end_y);
+	bool findPathBFS(int start_x, int start_y, int end_x, int end_y, bool flag);
 private:
 	int max_hight;
 	int max_width;
@@ -42,6 +52,6 @@ private:
 	direction next_direction;
 	bool isGetNextDirection;
 	bool canFindPath;
-	//queue<int *> queueBFS;
+	//std::queue<Point> queueBFS;
 };
 #endif

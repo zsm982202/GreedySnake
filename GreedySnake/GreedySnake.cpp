@@ -43,9 +43,9 @@ void GreedySnake::updateVisitedMatrix() {
 	}
 }
 
-void GreedySnake::move() {
+void GreedySnake::move(direction d) {
 	if (!isGameOver()) {
-		if (!isEat()) {
+		if (!isEat(d)) {
 			Node *node_temp_front = new Node;
 			switch (dir) {
 			case GreedySnake::Left:
@@ -87,25 +87,38 @@ void GreedySnake::move() {
 		updateVisitedMatrix();
 	}
 	else {
-		cout << "GameOver" << endl;
+		cout << "GameOver!Dir" << dir << endl;
+		Sleep(500000);
 		exit(0);
 	}
 }
 
-bool GreedySnake::isEat() {
-	switch (dir) {
+bool GreedySnake::isEat(direction d) {
+	switch (d) {
 	case GreedySnake::Left:
-		if (node_front->x - 1 == fruit_x && node_front->y == fruit_y)
+		if (node_front->x - 1 == fruit_x && node_front->y == fruit_y) {
 			return true;
+		}
+		else
+			return false;
 	case GreedySnake::Right:
-		if (node_front->x + 1 == fruit_x && node_front->y == fruit_y)
+		if (node_front->x + 1 == fruit_x && node_front->y == fruit_y) {
 			return true;
+		}
+		else
+			return false;
 	case GreedySnake::Up:
-		if (node_front->x == fruit_x && node_front->y - 1 == fruit_y)
+		if (node_front->x == fruit_x && node_front->y - 1 == fruit_y) {
 			return true;
+		}
+		else
+			return false;
 	case GreedySnake::Down:
-		if (node_front->x == fruit_x && node_front->y + 1 == fruit_y)
+		if (node_front->x == fruit_x && node_front->y + 1 == fruit_y) {
 			return true;
+		}
+		else
+			return false;
 	default:
 		return false;
 	}
@@ -166,187 +179,528 @@ void GreedySnake::setRandomFruit() {
 void GreedySnake::run() {
 	char input;
 	while (true) {
-		if (_kbhit()) {
-			input = _getch();
-			switch (input) {
-			case 'w':
-				if (dir != Down)
-					dir = Up;
-				break;
-			case 'a':
-				if (dir != Right)
-					dir = Left;
-				break;
-			case 's':
-				if (dir != Up)
-					dir = Down;
-				break;
-			case 'd':
-				if (dir != Left)
-					dir = Right;
-				break;
-			default:
-				break;
-			}
-		}
-		move();
-		show();
 		direction d;
-		findPath(d);
-		//cout << findPath(d) << endl;
-		//cout << d << endl;
-		Sleep(500);
+		if (findPath(d, node_front->x, node_front->y, fruit_x, fruit_y)) {
+			dir = d;
+			move(d);
+		}
+		else {
+			//cout << "false" << endl;
+			Sleep(300000000);
+		}
+		
+		
+		show();
+		Sleep(30);
 	}
 }
 
-bool GreedySnake::findPath(direction &next_dir) {
-	if (findPathBFS(node_front->x, node_front->y)) {
-		if (fruit_x >= node_front->x) {
-			if (visited_matrix[node_front->y*max_width + node_front->x + 1]) {
-				next_dir = Right;
-				return true;
-			}
-			if (fruit_y >= node_front->y) {
-				if (abs(fruit_x - node_front->x) >= abs(fruit_y - node_front->y)) {
-					if (visited_matrix[(node_front->y + 1)*max_width + node_front->x]) {
-						next_dir = Down;
-						return true;
-					}
-					else if (visited_matrix[(node_front->y - 1)*max_width + node_front->x]) {
-						next_dir = Up;
-						return true;
-					}
+inline bool GreedySnake::judgeDir(int x, int y, direction &next_dir, direction d) {
+	if (x < 0 || x >= max_width || y < 0 || y >= max_hight)
+		//cout << "ok" << endl;
+		return false;
+	if (!visited_matrix[y*max_width + x]||(x==node_rear->x&&y==node_rear->y)) {
+		int next_node_front_x;
+		int next_node_front_y;
+		switch (d) {
+		case Left:
+			if (dir == Right)
+				return false;
+			next_node_front_x = node_front->x - 1;
+			next_node_front_y = node_front->y;
+			break;
+		case Right:
+			if (dir == Left)
+				return false;
+			next_node_front_x = node_front->x + 1;
+			next_node_front_y = node_front->y;
+			break;
+		case Up:
+			if (dir == Down)
+				return false;
+			next_node_front_x = node_front->x;
+			next_node_front_y = node_front->y - 1;
+			break;
+		case Down:
+			if (dir == Up)
+				return false;
+			next_node_front_x = node_front->x;
+			next_node_front_y = node_front->y + 1;
+			break;
+		}
 
-				}
-			}
-			else {
-				if (abs(fruit_x - node_front->x) >= abs(fruit_y - node_front->y)) {
-					if (visited_matrix[node_front->y*max_width + node_front->x + 1]) {
-						next_dir = Right;
-						return true;
-					}
-					else if (visited_matrix[(node_front->y + 1)*max_width + node_front->x]) {
-						next_dir = Down;
-						return true;
-					}
-					else if (visited_matrix[(node_front->y - 1)*max_width + node_front->x]) {
-						next_dir = Up;
-						return true;
-					}
-					else {
-						next_dir = Left;
-						return true;
-					}
-				}
+		if (node_rear->prev == NULL) {
+			next_dir = d;
+			return true;
+		}
+		//如果走这一步能看到尾巴
+		if (!isEat(d)) {
+			if (findPathBFS(x, y, node_rear->prev->x, node_rear->prev->y, true)) {
+				next_dir = d;
+				return true;
 			}
 		}
 		else {
-			if (fruit_y >= node_front->y) {
-
-			}
-			else {
-
+			if (findPathBFS(x, y, node_rear->x, node_rear->y, true)) {
+				next_dir = d;
+				return true;
 			}
 		}
 	}
 	return false;
 }
 
-void GreedySnake::findPathDFS(int x, int y, int step, bool flag) {
-	if (isGetNextDirection)
-		return;
-	assume_visited_matrix[y*max_width + x] = true;
-	if (!flag) {
-		if (x == fruit_x && y == fruit_y) {
-			canFindPath = true;
-			if (min_step > step) {
-				cout << step << endl;
-				min_step = step;
+bool GreedySnake::findPath(direction &next_dir, int start_x, int start_y, int end_x, int end_y) {
+	if (findPathBFS(start_x, start_y, end_x, end_y, false)) {
+		//cout << "true";
+		if (end_x >= start_x) {
+			//Right&&Down
+			if (end_y >= start_y) {
+				if (abs(end_x - start_x) > abs(end_y - start_y)) {
+					if (judgeDir(start_x + 1, start_y, next_dir, Right))
+						return true;
+					if (judgeDir(start_x, start_y + 1, next_dir, Down))
+						return true;
+					if (judgeDir(start_x, start_y - 1, next_dir, Up))
+						return true;
+					if (judgeDir(start_x - 1, start_y, next_dir, Left))
+						return true;
+				}
+				else if (abs(end_x - start_x) < abs(end_y - start_y)) {
+					if (judgeDir(start_x, start_y + 1, next_dir, Down))
+						return true;
+					if (judgeDir(start_x + 1, start_y, next_dir, Right))
+						return true;
+					if (judgeDir(start_x - 1, start_y, next_dir, Left))
+						return true;
+					if (judgeDir(start_x, start_y - 1, next_dir, Up))
+						return true;
+				}
+				else {
+					srand(time(0));
+					int t = rand() % 2;
+					if (t == 0) {
+						if (judgeDir(start_x + 1, start_y, next_dir, Right))
+							return true;
+						if (judgeDir(start_x, start_y + 1, next_dir, Down))
+							return true;
+						if (judgeDir(start_x, start_y - 1, next_dir, Up))
+							return true;
+						if (judgeDir(start_x - 1, start_y, next_dir, Left))
+							return true;
+					}
+					else {
+						if (judgeDir(start_x, start_y + 1, next_dir, Down))
+							return true;
+						if (judgeDir(start_x + 1, start_y, next_dir, Right))
+							return true;
+						if (judgeDir(start_x - 1, start_y, next_dir, Left))
+							return true;
+						if (judgeDir(start_x, start_y - 1, next_dir, Up))
+							return true;
+					}
+				}
+			}
+			//Right&&Up
+			else {
+				if (abs(end_x - start_x) > abs(end_y - start_y)) {
+					if (judgeDir(start_x + 1, start_y, next_dir, Right))
+						return true;
+					if (judgeDir(start_x, start_y - 1, next_dir, Up))
+						return true;
+					if (judgeDir(start_x, start_y + 1, next_dir, Down))
+						return true;
+					if (judgeDir(start_x - 1, start_y, next_dir, Left))
+						return true;
+				}
+				else if (abs(end_x - start_x) < abs(end_y - start_y)) {
+					if (judgeDir(start_x, start_y - 1, next_dir, Up))
+						return true;
+					if (judgeDir(start_x + 1, start_y, next_dir, Right))
+						return true;
+					if (judgeDir(start_x - 1, start_y, next_dir, Left))
+						return true;
+					if (judgeDir(start_x, start_y + 1, next_dir, Down))
+						return true;
+				}
+				else {
+					srand(time(0));
+					int t = rand() % 2;
+					if (t == 0) {
+						if (judgeDir(start_x + 1, start_y, next_dir, Right))
+							return true;
+						if (judgeDir(start_x, start_y - 1, next_dir, Up))
+							return true;
+						if (judgeDir(start_x, start_y + 1, next_dir, Down))
+							return true;
+						if (judgeDir(start_x - 1, start_y, next_dir, Left))
+							return true;
+					}
+					else {
+						if (judgeDir(start_x, start_y - 1, next_dir, Up))
+							return true;
+						if (judgeDir(start_x + 1, start_y, next_dir, Right))
+							return true;
+						if (judgeDir(start_x - 1, start_y, next_dir, Left))
+							return true;
+						if (judgeDir(start_x, start_y + 1, next_dir, Down))
+							return true;
+					}
+				}
+			}
+		}
+		else {
+			//Left&&Down
+			if (end_y >= start_y) {
+				if (abs(end_x - start_x) > abs(end_y - start_y)) {
+					if (judgeDir(start_x - 1, start_y, next_dir, Left))
+						return true;
+					if (judgeDir(start_x, start_y + 1, next_dir, Down))
+						return true;
+					if (judgeDir(start_x, start_y - 1, next_dir, Up))
+						return true;
+					if (judgeDir(start_x + 1, start_y, next_dir, Right))
+						return true;
+				}
+				else if (abs(end_x - start_x) < abs(end_y - start_y)) {
+					if (judgeDir(start_x, start_y + 1, next_dir, Down))
+						return true;
+					if (judgeDir(start_x - 1, start_y, next_dir, Left))
+						return true;
+					if (judgeDir(start_x + 1, start_y, next_dir, Right))
+						return true;
+					if (judgeDir(start_x, start_y - 1, next_dir, Up))
+						return true;
+				}
+				else {
+					srand(time(0));
+					int t = rand() % 2;
+					if (t == 0) {
+						if (judgeDir(start_x - 1, start_y, next_dir, Left))
+							return true;
+						if (judgeDir(start_x, start_y + 1, next_dir, Down))
+							return true;
+						if (judgeDir(start_x, start_y - 1, next_dir, Up))
+							return true;
+						if (judgeDir(start_x + 1, start_y, next_dir, Right))
+							return true;
+					}
+					else {
+						if (judgeDir(start_x, start_y + 1, next_dir, Down))
+							return true;
+						if (judgeDir(start_x - 1, start_y, next_dir, Left))
+							return true;
+						if (judgeDir(start_x + 1, start_y, next_dir, Right))
+							return true;
+						if (judgeDir(start_x, start_y - 1, next_dir, Up))
+							return true;
+					}
+				}
+			}
+			//Left&&Up
+			else {
+				if (abs(end_x - start_x) > abs(end_y - start_y)) {
+					if (judgeDir(start_x - 1, start_y, next_dir, Left))
+						return true;
+					if (judgeDir(start_x, start_y - 1, next_dir, Up))
+						return true;
+					if (judgeDir(start_x, start_y + 1, next_dir, Down))
+						return true;
+					if (judgeDir(start_x + 1, start_y, next_dir, Right))
+						return true;
+				}
+				else if (abs(end_x - start_x) < abs(end_y - start_y)) {
+					if (judgeDir(start_x, start_y - 1, next_dir, Up))
+						return true;
+					if (judgeDir(start_x - 1, start_y, next_dir, Left))
+						return true;
+					if (judgeDir(start_x + 1, start_y, next_dir, Right))
+						return true;
+					if (judgeDir(start_x, start_y + 1, next_dir, Down))
+						return true;
+				}
+				else {
+					srand(time(0));
+					int t = rand() % 2;
+					if (t == 0) {
+						if (judgeDir(start_x - 1, start_y, next_dir, Left))
+							return true;
+						if (judgeDir(start_x, start_y - 1, next_dir, Up))
+							return true;
+						if (judgeDir(start_x, start_y + 1, next_dir, Down))
+							return true;
+						if (judgeDir(start_x + 1, start_y, next_dir, Right))
+							return true;
+					}
+					else {
+						if (judgeDir(start_x, start_y - 1, next_dir, Up))
+							return true;
+						if (judgeDir(start_x - 1, start_y, next_dir, Left))
+							return true;
+						if (judgeDir(start_x + 1, start_y, next_dir, Right))
+							return true;
+						if (judgeDir(start_x, start_y + 1, next_dir, Down))
+							return true;
+					}
+				}
 			}
 		}
 	}
 	else {
-		if (x == fruit_x && y == fruit_y) {
-			if (min_step == step) {
-				isGetNextDirection = true;
-				return;
+		if (end_x >= start_x) {
+			//Right&&Down
+			if (end_y >= start_y) {
+				if (abs(end_x - start_x) > abs(end_y - start_y)) {
+					if (judgeDir(start_x - 1, start_y, next_dir, Left))
+						return true;
+					if (judgeDir(start_x, start_y - 1, next_dir, Up))
+						return true;
+					if (judgeDir(start_x, start_y + 1, next_dir, Down))
+						return true;
+					if (judgeDir(start_x + 1, start_y, next_dir, Right))
+						return true;
+				}
+				else if (abs(end_x - start_x) < abs(end_y - start_y)) {
+					if (judgeDir(start_x, start_y - 1, next_dir, Up))
+						return true;
+					if (judgeDir(start_x - 1, start_y, next_dir, Left))
+						return true;
+					if (judgeDir(start_x + 1, start_y, next_dir, Right))
+						return true;
+					if (judgeDir(start_x, start_y + 1, next_dir, Down))
+						return true;
+				}
+				else {
+					srand(time(0));
+					int t = rand() % 2;
+					if (t == 0) {
+						if (judgeDir(start_x - 1, start_y, next_dir, Left))
+							return true;
+						if (judgeDir(start_x, start_y - 1, next_dir, Up))
+							return true;
+						if (judgeDir(start_x, start_y + 1, next_dir, Down))
+							return true;
+						if (judgeDir(start_x + 1, start_y, next_dir, Right))
+							return true;
+					}
+					else {
+						if (judgeDir(start_x, start_y - 1, next_dir, Up))
+							return true;
+						if (judgeDir(start_x - 1, start_y, next_dir, Left))
+							return true;
+						if (judgeDir(start_x + 1, start_y, next_dir, Right))
+							return true;
+						if (judgeDir(start_x, start_y + 1, next_dir, Down))
+							return true;
+					}
+				}
+			}
+			//Right&&Up
+			else {
+				if (abs(end_x - start_x) > abs(end_y - start_y)) {
+					if (judgeDir(start_x - 1, start_y, next_dir, Left))
+						return true;
+					if (judgeDir(start_x, start_y + 1, next_dir, Down))
+						return true;
+					if (judgeDir(start_x, start_y - 1, next_dir, Up))
+						return true;
+					if (judgeDir(start_x + 1, start_y, next_dir, Right))
+						return true;
+				}
+				else if (abs(end_x - start_x) < abs(end_y - start_y)) {
+					if (judgeDir(start_x, start_y + 1, next_dir, Down))
+						return true;
+					if (judgeDir(start_x - 1, start_y, next_dir, Left))
+						return true;
+					if (judgeDir(start_x + 1, start_y, next_dir, Right))
+						return true;
+					if (judgeDir(start_x, start_y - 1, next_dir, Up))
+						return true;
+				}
+				else {
+					srand(time(0));
+					int t = rand() % 2;
+					if (t == 0) {
+						if (judgeDir(start_x - 1, start_y, next_dir, Left))
+							return true;
+						if (judgeDir(start_x, start_y + 1, next_dir, Down))
+							return true;
+						if (judgeDir(start_x, start_y - 1, next_dir, Up))
+							return true;
+						if (judgeDir(start_x + 1, start_y, next_dir, Right))
+							return true;
+					}
+					else {
+						if (judgeDir(start_x, start_y + 1, next_dir, Down))
+							return true;
+						if (judgeDir(start_x - 1, start_y, next_dir, Left))
+							return true;
+						if (judgeDir(start_x + 1, start_y, next_dir, Right))
+							return true;
+						if (judgeDir(start_x, start_y - 1, next_dir, Up))
+							return true;
+					}
+				}
+			}
+		}
+		else {
+			//Left&&Down
+			if (end_y >= start_y) {
+				if (abs(fruit_x - start_x) > abs(end_y - start_y)) {
+					if (judgeDir(start_x + 1, start_y, next_dir, Right))
+						return true;
+					if (judgeDir(start_x, start_y - 1, next_dir, Up))
+						return true;
+					if (judgeDir(start_x, start_y + 1, next_dir, Down))
+						return true;
+					if (judgeDir(start_x - 1, start_y, next_dir, Left))
+						return true;
+				}
+				else if (abs(fruit_x - start_x) < abs(end_y - start_y)) {
+					if (judgeDir(start_x, start_y - 1, next_dir, Up))
+						return true;
+					if (judgeDir(start_x + 1, start_y, next_dir, Right))
+						return true;
+					if (judgeDir(start_x - 1, start_y, next_dir, Left))
+						return true;
+					if (judgeDir(start_x, start_y + 1, next_dir, Down))
+						return true;
+				}
+				else {
+					srand(time(0));
+					int t = rand() % 2;
+					if (t == 0) {
+						if (judgeDir(start_x + 1, start_y, next_dir, Right))
+							return true;
+						if (judgeDir(start_x, start_y - 1, next_dir, Up))
+							return true;
+						if (judgeDir(start_x, start_y + 1, next_dir, Down))
+							return true;
+						if (judgeDir(start_x - 1, start_y, next_dir, Left))
+							return true;
+					}
+					else {
+						if (judgeDir(start_x, start_y - 1, next_dir, Up))
+							return true;
+						if (judgeDir(start_x + 1, start_y, next_dir, Right))
+							return true;
+						if (judgeDir(start_x - 1, start_y, next_dir, Left))
+							return true;
+						if (judgeDir(start_x, start_y + 1, next_dir, Down))
+							return true;
+					}
+				}
+			}
+			//Left&&Up
+			else {
+				if (abs(end_x - start_x) > abs(end_y - start_y)) {
+					if (judgeDir(start_x + 1, start_y, next_dir, Right))
+						return true;
+					if (judgeDir(start_x, start_y + 1, next_dir, Down))
+						return true;
+					if (judgeDir(start_x, start_y - 1, next_dir, Up))
+						return true;
+					if (judgeDir(start_x - 1, start_y, next_dir, Left))
+						return true;
+				}
+				else if (abs(end_x - start_x) < abs(end_y - start_y)) {
+					if (judgeDir(start_x, start_y + 1, next_dir, Down))
+						return true;
+					if (judgeDir(start_x + 1, start_y, next_dir, Right))
+						return true;
+					if (judgeDir(start_x - 1, start_y, next_dir, Left))
+						return true;
+					if (judgeDir(start_x, start_y - 1, next_dir, Up))
+						return true;
+				}
+				else {
+					srand(time(0));
+					int t = rand() % 2;
+					if (t == 0) {
+						if (judgeDir(start_x + 1, start_y, next_dir, Right))
+							return true;
+						if (judgeDir(start_x, start_y + 1, next_dir, Down))
+							return true;
+						if (judgeDir(start_x, start_y - 1, next_dir, Up))
+							return true;
+						if (judgeDir(start_x - 1, start_y, next_dir, Left))
+							return true;
+					}
+					else {
+						if (judgeDir(start_x, start_y + 1, next_dir, Down))
+							return true;
+						if (judgeDir(start_x + 1, start_y, next_dir, Right))
+							return true;
+						if (judgeDir(start_x - 1, start_y, next_dir, Left))
+							return true;
+						if (judgeDir(start_x, start_y - 1, next_dir, Up))
+							return true;
+					}
+				}
 			}
 		}
 	}
-	if (x > 0 && !assume_visited_matrix[y*max_width + x - 1]) {
-		if (step == 0) {
-			next_direction = Left;
-		}
-		findPathDFS(x - 1, y, step + 1, flag);
-		if (isGetNextDirection)
-			return;
-	}
-	if (x < max_width - 1 && !assume_visited_matrix[y*max_width + x + 1]) {
-		if (step == 0) {
-			next_direction = Right;
-		}
-		findPathDFS(x + 1, y, step + 1, flag);
-		if (isGetNextDirection)
-			return;
-	}
-	if (y > 0 && !assume_visited_matrix[(y - 1)*max_width + x]) {
-		if (step == 0) {
-			next_direction = Up;
-		}
-		findPathDFS(x, y - 1, step + 1, flag);
-		if (isGetNextDirection)
-			return;
-	}
-	if (y < max_hight && !assume_visited_matrix[(y + 1)*max_width + x]) {
-		if (step == 0) {
-			next_direction = Down;
-		}
-		findPathDFS(x, y + 1, step + 1, flag);
-		if (isGetNextDirection)
-			return;
-	}
-	assume_visited_matrix[y*max_width + x] = false;
+	return false;
 }
 
-bool GreedySnake::findPathBFS(int x, int y) {
+
+bool GreedySnake::findPathBFS(int start_x, int start_y, int end_x, int end_y, bool flag) {
 	assume_visited_matrix = new bool[max_hight*max_width];
 	for (int i = 0; i < max_hight*max_width; i++) {
 		assume_visited_matrix[i] = visited_matrix[i];
 	}
+	assume_visited_matrix[end_y*max_width + end_x] = false;
+	if (flag) {
+		assume_visited_matrix[node_rear->y*max_width + node_rear->x] = false;
+	}
+	Point p(start_x, start_y);
+	queue<Point> queueBFS;
+	queueBFS.push(p);
 
-	/*queueBFS.push({ x,y });
-	assume_visited_matrix[y*max_width + x] = true;
+	assume_visited_matrix[start_y*max_width + start_x] = true;
+
 	while (!queueBFS.empty()) {
-		int *temp;
-		queueBFS.pop(temp);
-		int temp_x = temp[0];
-		int temp_y = temp[1];
+		Point p = queueBFS.front();
+		int temp_x = p.x;
+		int temp_y = p.y;
+		queueBFS.pop();
 
-		if (temp_x == fruit_x && temp_y == fruit_y) {
+		if (temp_x == end_x && temp_y == end_y) {
 			return true;
 		}
-
 		//Right
-		if (!assume_visited_matrix[temp_y*max_width + temp_x + 1]) {
-			queueBFS.push({ temp_x + 1,temp_y });
-			assume_visited_matrix[temp_y*max_width + temp_x + 1] = true;
+		Point p1(temp_x + 1, temp_y);
+		if (p1.x >= 0 && p1.x < max_width && p1.y >= 0 && p1.y < max_hight) {
+			if (!assume_visited_matrix[p1.y * max_width + p1.x]) {
+				queueBFS.push(p1);
+				assume_visited_matrix[p1.y * max_width + p1.x] = true;
+			}
 		}
 		//Left
-		if (!assume_visited_matrix[temp_y*max_width + temp_x - 1]) {
-			queueBFS.push({ temp_x - 1,temp_y });
-			assume_visited_matrix[temp_y*max_width + temp_x - 1] = true;
+		Point p2(temp_x - 1, temp_y);
+		if (p2.x >= 0 && p2.x < max_width && p2.y >= 0 && p2.y < max_hight) {
+			if (!assume_visited_matrix[p2.y * max_width + p2.x]) {
+				queueBFS.push(p2);
+				assume_visited_matrix[p2.y * max_width + p2.x] = true;
+			}
 		}
 		//Up
-		if (!assume_visited_matrix[(temp_y - 1)*max_width + temp_x]) {
-			queueBFS.push({ temp_x,temp_y - 1 });
-			assume_visited_matrix[(temp_y - 1)*max_width + temp_x] = true;
+		Point p3(temp_x, temp_y - 1);
+		if (p3.x >= 0 && p3.x < max_width && p3.y >= 0 && p3.y < max_hight) {
+			if (!assume_visited_matrix[p3.y * max_width + p3.x]) {
+				queueBFS.push(p3);
+				assume_visited_matrix[p3.y * max_width + p3.x] = true;
+			}
 		}
 		//Down
-		if (!assume_visited_matrix[(temp_y + 1)*max_width + temp_x]) {
-			queueBFS.push({ temp_x,temp_y + 1 });
-			assume_visited_matrix[(temp_y + 1)*max_width + temp_x] = true;
+		Point p4(temp_x, temp_y + 1);
+		if (p4.x >= 0 && p4.x < max_width && p4.y >= 0 && p4.y < max_hight) {
+			if (!assume_visited_matrix[p4.y * max_width + p4.x]) {
+				queueBFS.push(p4);
+				assume_visited_matrix[p4.y * max_width + p4.x] = true;
+			}
 		}
-	}*/
+	}
 	return false;
 }
 
@@ -370,9 +724,9 @@ void GreedySnake::show() {
 			if (fruit_x == j && fruit_y == i)
 				flag2 = true;
 			if (flag1)
-				cout << "# ";
-			else if (flag2)
 				cout << "* ";
+			else if (flag2)
+				cout << "# ";
 			else
 				cout << "  ";
 		}
