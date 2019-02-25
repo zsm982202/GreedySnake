@@ -33,6 +33,7 @@ private:
 	int min_step;
 	bool isGetNextDirection;
 	bool canFindPath;
+	bool isWin;
 	direction dir;
 	direction next_direction;
 	Node *node_front;

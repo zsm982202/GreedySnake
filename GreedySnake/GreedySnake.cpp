@@ -28,6 +28,7 @@ GreedySnake::~GreedySnake() {
 }
 
 void GreedySnake::initSnake() {
+	isWin = false;
 	int temp_x = randomNum(0, max_width);
 	int temp_y = randomNum(0, max_hight);
 	Node *temp_node = new Node;
@@ -96,8 +97,7 @@ void GreedySnake::move(direction d) {
 		updateVisitedMatrix();
 	}
 	else {
-		cout << "GameOver!Dir" << dir << endl;
-		Sleep(500000);
+		cout << "GameOver!" << endl;
 		exit(0);
 	}
 }
@@ -167,6 +167,14 @@ int GreedySnake::randomNum(int min_num, int max_num) {
 }
 
 void GreedySnake::setRandomFruit() {
+	int count = 0;
+	Node *p = node_front;
+	while (p != NULL) {
+		count++;
+		p = p->next;
+	}
+	if (count == max_width * max_hight - 1)
+		isWin = true;
 	bool isOverrided = false;
 	int temp_x;
 	int temp_y;
@@ -186,7 +194,7 @@ void GreedySnake::setRandomFruit() {
 }
 
 void GreedySnake::run() {
-	while (true) {
+	while (!isWin) {
 		direction d;
 		findPath(d, node_front->x, node_front->y, fruit_x, fruit_y);
 		dir = d;
@@ -194,6 +202,7 @@ void GreedySnake::run() {
 		show();
 		//Sleep(30);
 	}
+	cout << "You win!" << endl;
 }
 
 inline bool GreedySnake::judgeDir(int x, int y, direction &next_dir, direction d) {
@@ -278,6 +287,11 @@ void GreedySnake::findPath(direction &next_dir, int start_x, int start_y, int en
 				else {
 					srand((int)time(0));
 					int t = rand() % 2;
+					if (fruit_x == max_width - 1) {
+						t = 1;
+						if (node_rear->prev->x < start_x&&start_x < fruit_x)
+							t = 0;
+					}
 					if (t == 0) {
 						if (judgeDir(start_x + 1, start_y, next_dir, Right))
 							return;
@@ -325,6 +339,11 @@ void GreedySnake::findPath(direction &next_dir, int start_x, int start_y, int en
 				else {
 					srand((int)time(0));
 					int t = rand() % 2;
+					if (fruit_x == max_width - 1) {
+						t = 1;
+						if (node_rear->prev->x < start_x&&start_x < fruit_x)
+							t = 0;
+					}
 					if (t == 0) {
 						if (judgeDir(start_x + 1, start_y, next_dir, Right))
 							return;
@@ -374,6 +393,11 @@ void GreedySnake::findPath(direction &next_dir, int start_x, int start_y, int en
 				else {
 					srand((int)time(0));
 					int t = rand() % 2;
+					if (fruit_x == 0) {
+						t = 1;
+						if (fruit_x < start_x&&start_x < node_rear->prev->x)
+							t = 0;
+					}
 					if (t == 0) {
 						if (judgeDir(start_x - 1, start_y, next_dir, Left))
 							return;
@@ -421,6 +445,11 @@ void GreedySnake::findPath(direction &next_dir, int start_x, int start_y, int en
 				else {
 					srand((int)time(0));
 					int t = rand() % 2;
+					if (fruit_x == 0) {
+						t = 1;
+						if (fruit_x < start_x&&start_x < node_rear->prev->x)
+							t = 0;
+					}
 					if (t == 0) {
 						if (judgeDir(start_x - 1, start_y, next_dir, Left))
 							return;
@@ -643,6 +672,8 @@ void GreedySnake::findPath(direction &next_dir, int start_x, int start_y, int en
 
 
 bool GreedySnake::findPathBFS(int start_x, int start_y, int end_x, int end_y, bool flag) {
+	if (start_x < 0 || start_x >= max_width || start_y < 0 || start_y >= max_hight)
+		return false;
 	assume_visited_matrix = new bool[max_hight*max_width];
 	for (int i = 0; i < max_hight*max_width; i++) {
 		assume_visited_matrix[i] = visited_matrix[i];
