@@ -640,6 +640,7 @@ bool GreedySnake::findPathBFS(int start_x, int start_y, int end_x, int end_y, bo
 	}
 	assume_visited_matrix[end_y*max_width + end_x] = false;
 	if (flag) {
+		assume_visited_matrix[fruit_y*max_width + fruit_x] = false;
 		assume_visited_matrix[node_rear->y*max_width + node_rear->x] = false;
 	}
 	Point p(start_x, start_y);
@@ -695,16 +696,73 @@ bool GreedySnake::findPathBFS(int start_x, int start_y, int end_x, int end_y, bo
 
 void GreedySnake::show() {
 	system("cls");
+	//cout << "¡ª|o" << endl;
+	//0:null  1:left&right   2:up&down    3:corner   4:front    5:rear    6:fruit
+	int showMatrix[100];
+	for (int i = 0; i < max_width*max_hight; i++)
+		showMatrix[i] = 0;
+	Node *p = node_front;
+	showMatrix[p->y*max_width + p->x] = 4;
+	p = p->next;
+	while (p != NULL) {
+		if (p->next != NULL) {
+			if (p->prev->x == p->x&&p->x == p->next->x)
+				showMatrix[p->y*max_width + p->x] = 2;
+			else if (p->prev->y == p->y&&p->y == p->next->y)
+				showMatrix[p->y*max_width + p->x] = 1;
+			else
+				showMatrix[p->y*max_width + p->x] = 3;
+		}
+		else {
+				showMatrix[p->y*max_width + p->x] = 5;
+		}
+		p = p->next;
+	}
+	showMatrix[fruit_y*max_width + fruit_x] = 6;
+	
 	for (int i = 0; i < max_width + 2; i++) {
+		cout << "# ";
+	}
+	cout << endl;
+	for (int i = 0; i < max_hight; i++) {
+		cout << "# ";
+		for (int j = 0; j < max_width; j++) {
+			if (showMatrix[i*max_width + j] == 4)
+				cout << "Y "; 
+			else if (showMatrix[i*max_width + j] == 5)
+				cout << "o ";
+			else if (showMatrix[i*max_width + j] == 6)
+				cout << "* ";
+			else if (showMatrix[i*max_width + j] == 0)
+				cout << "  ";
+			else if (showMatrix[i*max_width + j] == 1)
+				cout << "¡ª";
+			else if (showMatrix[i*max_width + j] == 2)
+				cout << "| ";
+			else if (showMatrix[i*max_width + j] == 3)
+				cout << "¡¤";
+		}
+		cout << "#" << endl;
+	}
+	for (int i = 0; i < max_width + 2; i++) {
+		cout << "# ";
+	}
+	cout << endl;
+
+	/*for (int i = 0; i < max_width + 2; i++) {
 		cout << "@ ";
 	}
 	cout << endl;
 	for (int i = 0; i < max_hight; i++) {
 		cout << "@ ";
 		for (int j = 0; j < max_width; j++) {
+			int isNodeFront = false;
 			int flag1 = false;
 			int flag2 = false;
 			Node *p = node_front;
+			if (p->x == j && p->y == i)
+				isNodeFront = true;
+			p = p->next;
 			while (p != NULL) {
 				if (p->x == j && p->y == i)
 					flag1 = true;
@@ -712,7 +770,9 @@ void GreedySnake::show() {
 			}
 			if (fruit_x == j && fruit_y == i)
 				flag2 = true;
-			if (flag1)
+			if (isNodeFront)
+				cout << "O ";
+			else if (flag1)
 				cout << "* ";
 			else if (flag2)
 				cout << "# ";
@@ -724,5 +784,5 @@ void GreedySnake::show() {
 	for (int i = 0; i < max_width + 2; i++) {
 		cout << "@ ";
 	}
-	cout << endl;
+	cout << endl;*/
 }
