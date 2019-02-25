@@ -198,7 +198,7 @@ void GreedySnake::run() {
 		direction d;
 		findPath(d, node_front->x, node_front->y, fruit_x, fruit_y);
 		dir = d;
-		move(d);
+		move(dir);
 		show();
 		//Sleep(30);
 	}
@@ -287,7 +287,7 @@ void GreedySnake::findPath(direction &next_dir, int start_x, int start_y, int en
 				else {
 					srand((int)time(0));
 					int t = rand() % 2;
-					if (fruit_x == max_width - 1) {
+					if (node_rear->prev != NULL && fruit_x == max_width - 1) {
 						t = 1;
 						if (node_rear->prev->x < start_x&&start_x < fruit_x)
 							t = 0;
@@ -339,7 +339,7 @@ void GreedySnake::findPath(direction &next_dir, int start_x, int start_y, int en
 				else {
 					srand((int)time(0));
 					int t = rand() % 2;
-					if (fruit_x == max_width - 1) {
+					if (node_rear->prev != NULL && fruit_x == max_width - 1) {
 						t = 1;
 						if (node_rear->prev->x < start_x&&start_x < fruit_x)
 							t = 0;
@@ -393,7 +393,7 @@ void GreedySnake::findPath(direction &next_dir, int start_x, int start_y, int en
 				else {
 					srand((int)time(0));
 					int t = rand() % 2;
-					if (fruit_x == 0) {
+					if (node_rear->prev != NULL && fruit_x == 0) {
 						t = 1;
 						if (fruit_x < start_x&&start_x < node_rear->prev->x)
 							t = 0;
@@ -445,7 +445,7 @@ void GreedySnake::findPath(direction &next_dir, int start_x, int start_y, int en
 				else {
 					srand((int)time(0));
 					int t = rand() % 2;
-					if (fruit_x == 0) {
+					if (node_rear->prev != NULL && fruit_x == 0) {
 						t = 1;
 						if (fruit_x < start_x&&start_x < node_rear->prev->x)
 							t = 0;
