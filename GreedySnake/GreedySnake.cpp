@@ -15,7 +15,16 @@ GreedySnake::GreedySnake(int hight/*= 10*/, int width/*= 10*/) {
 			visited_matrix[i*max_width + j] = false;
 	}
 	dir = Left;
+	showMatrix = new int[max_width*max_hight];
 	initSnake();
+}
+
+GreedySnake::~GreedySnake() {
+	delete showMatrix;
+	delete node_front;
+	delete node_rear;
+	delete visited_matrix;
+	delete assume_visited_matrix;
 }
 
 void GreedySnake::initSnake() {
@@ -697,7 +706,6 @@ bool GreedySnake::findPathBFS(int start_x, int start_y, int end_x, int end_y, bo
 void GreedySnake::show() {
 	system("cls");
 	//0:null  1:left&right   2:up&down    3:corner   4:front    5:rear    6:fruit
-	int *showMatrix = new int[max_width*max_hight];
 	for (int i = 0; i < max_width*max_hight; i++)
 		showMatrix[i] = 0;
 	Node *p = node_front;
