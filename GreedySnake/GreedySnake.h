@@ -48,6 +48,5 @@ private:
 	direction next_direction;
 	bool isGetNextDirection;
 	bool canFindPath;
-	//int *showMatrix;
 };
 #endif

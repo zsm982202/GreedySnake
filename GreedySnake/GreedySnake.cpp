@@ -183,7 +183,7 @@ void GreedySnake::run() {
 		dir = d;
 		move(d);
 		show();
-		Sleep(30);
+		//Sleep(30);
 	}
 }
 
@@ -696,9 +696,8 @@ bool GreedySnake::findPathBFS(int start_x, int start_y, int end_x, int end_y, bo
 
 void GreedySnake::show() {
 	system("cls");
-	//cout << "¡ª|o" << endl;
 	//0:null  1:left&right   2:up&down    3:corner   4:front    5:rear    6:fruit
-	int showMatrix[100];
+	int *showMatrix = new int[max_width*max_hight];
 	for (int i = 0; i < max_width*max_hight; i++)
 		showMatrix[i] = 0;
 	Node *p = node_front;
@@ -748,41 +747,4 @@ void GreedySnake::show() {
 		cout << "# ";
 	}
 	cout << endl;
-
-	/*for (int i = 0; i < max_width + 2; i++) {
-		cout << "@ ";
-	}
-	cout << endl;
-	for (int i = 0; i < max_hight; i++) {
-		cout << "@ ";
-		for (int j = 0; j < max_width; j++) {
-			int isNodeFront = false;
-			int flag1 = false;
-			int flag2 = false;
-			Node *p = node_front;
-			if (p->x == j && p->y == i)
-				isNodeFront = true;
-			p = p->next;
-			while (p != NULL) {
-				if (p->x == j && p->y == i)
-					flag1 = true;
-				p = p->next;
-			}
-			if (fruit_x == j && fruit_y == i)
-				flag2 = true;
-			if (isNodeFront)
-				cout << "O ";
-			else if (flag1)
-				cout << "* ";
-			else if (flag2)
-				cout << "# ";
-			else
-				cout << "  ";
-		}
-		cout << "@" << endl;
-	}
-	for (int i = 0; i < max_width + 2; i++) {
-		cout << "@ ";
-	}
-	cout << endl;*/
 }
